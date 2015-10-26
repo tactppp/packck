@@ -1,0 +1,251 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=shift_jis">
+<title>05 - 02 - 2限 - 2015年度前期 - koba</title></head><body>
+<p>ステージを選択してください。</p>
+<input type="button" value="1" onclick="stage1();" />
+<input type="button" value="2" onclick="stage2();" />
+<input type="button" value="3" onclick="stage3();" />
+<input type="button" value="4" onclick="stage4();" />
+<br>
+<canvas width="500" height="500" id="c01" style="border:1px solid black"></canvas>
+<script language="JavaScript">
+ctx = document.getElementById("c01").getContext("2d")
+ctx.fillStyle = "rgb(0, 0, 0)"
+ctx.fillRect(0, 0, 500, 500)
+ctx.beginPath();
+ctx.moveTo(230, 250); 
+ctx.arc(230, 250, 100, 40 *Math.PI/180, 320 *Math.PI/180, false);
+ctx.fillStyle = "rgb(0, 255, 0)"
+ctx.fill();
+ctx.beginPath();
+ctx.arc(380, 250, 60, 0, Math.PI *2, false);
+ctx.fillStyle = "rgb(0, 0, 255)"
+ctx.fill();
+ 
+
+function stage1(){
+  kabe = []
+  kabe[0] = [2, 1]
+  kabe[1] = [2, 2]
+  kabe[2] = [1, 2]
+  packGame()
+}
+function stage2(){
+  kabe = []
+  for(i=0; i<7; i++){
+    kabe[i] = [8-i, i]
+  }
+  packGame()
+}
+function stage3(){
+  kabe = []
+  for(i=0; i<3; i++){
+    kabe[i] = [i+1, 1]
+  }
+  for(i=0; i<5; i++){
+    kabe[i+3] = [2, i+2]
+  }
+  kabe[8] = [1, 7]
+  kabe[9] = [6, 2]
+  kabe[10] = [7, 2]
+  kabe[11] = [8, 3]
+  kabe[12] = [5, 3]
+  for(i=0; i<4; i++){
+    kabe[i+13] = [5+i, 4+i]
+  }
+  kabe[17] = [8, 8]
+  kabe[18] = [7, 9]
+  kabe[19] = [6, 9]
+  kabe[20] = [5, 8]
+  packGame()
+}
+function stage4(){
+  kabe = []
+  for(i=0; i<9; i++){
+    kabe[i] = [i, 1]
+  }
+  for(i=0; i<7; i++){
+    kabe[9+i] = [8, 2+i]
+  }
+  for(i=0; i<7; i++){
+    kabe[16+i] = [7-i, 8]
+  }
+  for(i=0; i<5; i++){
+    kabe[23+i] = [1, 7-i]
+  }
+  for(i=0; i<5; i++){
+    kabe[28+i] = [2+i, 3]
+  }
+  for(i=0; i<3; i++){
+    kabe[33+i] = [6, 4+i]
+  }
+  for(i=0; i<3; i++){
+    kabe[36+i] = [5-i, 6]
+  }
+  kabe[39] = [3, 5]
+  packGame()
+}
+function packGame(){
+  Right = 39
+  Left = 37
+  Up = 38
+  Down = 40
+  angleSet1 = 30
+  angleSet2 = angleSet1 + 300
+  angle1 = angleSet1
+  angle2 = angleSet2
+  block_size = 50
+  field_size = 10
+  width = block_size * field_size
+  packman = [0, 0]
+  esa = []
+  esa_kosuu = 10
+  esa_hantei = []
+  for(i=0; i<esa_kosuu; i++){
+    esa_hantei[i] = 0
+  }
+  kabe_kosuu = kabe.length
+  onkeydown = keydown
+  esa_kubaru()
+  draw()
+
+  function keydown(e){
+    switch(e.keyCode){
+      case Right:
+        angle1 = angleSet1
+        angle2 = angleSet2
+        if(kabe_check(Right)){
+          break
+        }else if(packman[0] < field_size-1){
+          packman[0]++
+        }
+        break
+      case Left:
+        angle1 = angleSet1 + 180
+        angle2 = angleSet2 + 180
+        if(kabe_check(Left)){
+          break
+        }else if(packman[0] > 0){
+          packman[0]--
+        }
+        break
+      case Up:
+        angle1 = angleSet1 + 270
+        angle2 = angleSet2 + 270
+        if(kabe_check(Up)){
+          break
+        }else if(packman[1] > 0){
+          packman[1]--
+        }
+        break
+      case Down:
+        angle1 = angleSet1 + 90
+        angle2 = angleSet2 + 90
+        if(kabe_check(Down)){
+          break
+        }else if(packman[1] < field_size-1){
+          packman[1]++
+        }
+        break
+    }
+    draw()
+  }
+  function kabe_check(a){
+    for(i=0; i<kabe_kosuu; i++){
+      switch(a){
+        case Right:
+          if(packman[0]+1==kabe[i][0] && packman[1]==kabe[i][1]){
+            return true
+          }
+          break
+        case Left:
+          if(packman[0]-1==kabe[i][0] && packman[1]==kabe[i][1]){
+            return true
+          }
+          break
+        case Up:
+          if(packman[0]==kabe[i][0] && packman[1]-1==kabe[i][1]){
+            return true
+          }
+          break
+        case Down:
+          if(packman[0]==kabe[i][0] && packman[1]+1==kabe[i][1]){
+            return true
+          }
+          break
+        default:
+          return false
+          break
+      }
+    }
+    return false
+  }
+  function draw(){
+    draw_haikei()
+    draw_packman(packman[0] * block_size, packman[1] * block_size, 25)
+    draw_kabe()
+    draw_esa()
+    tokuten()
+  }
+  function draw_haikei(){
+    ctx.fillStyle = "rgb(0, 0, 0)"
+    ctx.fillRect(0, 0, width, width)
+  }
+  function draw_packman(x, y, radius){
+    ctx.beginPath();
+    ctx.moveTo(25 + x, 25 + y); 
+    ctx.arc(25 + x, 25 + y, radius, angle1 *Math.PI/180, angle2 *Math.PI/180, false);
+    ctx.fillStyle = "rgb(0, 255, 0)"
+    ctx.fill();
+  }
+  function draw_kabe(){
+    for(i=0; i<kabe_kosuu; i++){
+      ctx.fillStyle = "maroon"
+      ctx.fillRect(kabe[i][0] * block_size, kabe[i][1] * block_size, block_size, block_size)
+    }
+  }
+  function draw_esa(){
+    for(i=0; i<esa_kosuu; i++){
+      if(packman.toString()==esa[i].toString()){
+        esa_hantei[i] = 1
+      }
+      if(esa_hantei[i]==0){
+        ctx.beginPath();
+        ctx.arc(esa[i][0] * block_size + 25, esa[i][1] * block_size + 25, 25, 0, Math.PI *2, true)
+        ctx.fillStyle = "blue"
+        ctx.fill();
+      }
+    }
+  }
+  function esa_kubaru(){
+    for(i=0; i<esa_kosuu; i++){
+      esa[i] = [0, 0]
+      do{
+        esa[i][0] = Math.floor(Math.random() * field_size)
+        esa[i][1] = Math.floor(Math.random() * field_size)
+      }while(esa_check(i))
+    }
+  }
+  function esa_check(x){
+    for(j=0; j<x; j++){
+      if(esa[x].toString() == packman.toString() || esa[x].toString()==esa[j].toString()){
+        return true;
+      }
+    }
+    for(j=0; j<kabe_kosuu; j++){
+      if(esa[x].toString() == kabe[j].toString()){
+        return true;
+      }
+    }
+    return false
+  }
+  function tokuten(){
+    score = 0
+    for(i=0; i<esa_kosuu; i++){
+      score += esa_hantei[i]
+    }
+    if(score==esa_kosuu){
+      alert("clear")
+    }
+  }
+}
+</script></body></html>
